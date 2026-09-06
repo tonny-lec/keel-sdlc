@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+*.egg-info/
+build/
+dist/
+# Share reusable configuration and contracts; keep local execution state private.
+.sdlc/*
+!.sdlc/config.json
+!.sdlc/changes/
+.sdlc/changes/*/*
+!.sdlc/changes/*/change.json
+/artifacts/

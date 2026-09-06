@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "id": "keel-core",
+  "intent": "あいまいな要求と不確実な前提を、証拠・予算・復旧可能な状態で扱うローカルSDLCハーネスを届ける",
+  "owner": "repository-maintainer",
+  "risk": "medium",
+  "scope": {
+    "include": [
+      "モデルに依存しないCLI",
+      "契約と不確実性",
+      "入力に結び付けた証拠",
+      "予算付きPOSIX実行",
+      "リリースの引き渡しと観測",
+      "日本語の運用手順"
+    ],
+    "exclude": [
+      "モデルAPIの呼出し",
+      "本番への自動配置",
+      "認証済み承認サービス",
+      "OSサンドボックス",
+      "常駐監視",
+      "分散実行基盤"
+    ],
+    "constraints": [
+      "実行時はPython標準ライブラリのみ",
+      "検証環境はLinux / Python 3.12",
+      "別環境では検証してから導入",
+      "最新の失敗を古い成功で隠さない"
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "statement": "契約と依存グラフを検証する",
+      "acceptance": [
+        "型・参照・重複・循環を拒否する",
+        "不足した条件では状態を進めず理由を返す"
+      ],
+      "checks": [
+        "unit",
+        "schemas"
+      ],
+      "priority": "must"
+    },
+    {
+      "id": "R2",
+      "statement": "不確実性を証拠で扱う",
+      "acceptance": [
+        "高影響の未決定事項を受容だけで通さない",
+        "要求確認と技術証拠を区別する",
+        "反証と期限付きの受容を扱う"
+      ],
+      "checks": [
+        "unit",
+        "demo"
+      ],
+      "priority": "must"
+    },
+    {
+      "id": "R3",
+      "statement": "入力の変化で証拠を失効させる",
+      "acceptance": [
+        "コード・設定・環境・成果物・ログの変化を検出する",
+        "最新の失敗と期限切れを検出する"
+      ],
+      "checks": [
+        "unit"
+      ],
+      "priority": "must"
+    },
+    {
+      "id": "R4",
+      "statement": "チェックを予算内で実行して中断を記録する",
+      "acceptance": [
+        "時間・出力・回数・試行数を制限する",
+        "通常の子プロセスを停止する",
+        "クラッシュした予約の消費を保持する"
+      ],
+      "checks": [
+        "unit"
+      ],
+      "priority": "must"
+    },
+    {
+      "id": "R5",
+      "statement": "状態と引き渡しの一貫性を確認できる",
+      "acceptance": [
+        "同一世代からの同時更新は一方だけ成功する",
+        "履歴の再生と破損検出を行う",
+        "成果物・証拠・回答・配置記録を照合する",
+        "観測後に完了する"
+      ],
+      "checks": [
+        "unit",
+        "demo"
+      ],
+      "priority": "must"
+    }
+  ],
+  "uncertainties": [],
+  "decisions": [
+    {
+      "id": "D1",
+      "question": "制御と権限の境界をどこに置くか",
+      "choice": "標準ライブラリのCLI、SQLite、外部配置へのパケット接続",
+      "alternatives": [
+        "プロンプトだけで制御する",
+        "認証・配置を含む外部ワークフローサービスに統合する"
+      ],
+      "rationale": "ローカルで再現できる機械的な条件と、導入先の判断・認証・隔離を明確に分ける",
+      "reversibility": "costly",
+      "rollback": "書き手を停止し、検証済みの配布版と状態バックアップを新しいディレクトリへ復元する",
+      "uncertainties": []
+    }
+  ],
+  "slices": [
+    {
+      "id": "S1",
+      "title": "契約と依存グラフを検証する",
+      "requirements": [
+        "R1"
+      ],
+      "checks": [
+        "unit",
+        "schemas"
+      ],
+      "depends_on": [],
+      "done_when": "対応する受け入れ条件と回帰テストが通る",
+      "rollback": "実行中の処理を停止し、前の配布版と対応する状態・証拠のバックアップへ戻す"
+    },
+    {
+      "id": "S2",
+      "title": "不確実性を証拠で扱う",
+      "requirements": [
+        "R2"
+      ],
+      "checks": [
+        "unit",
+        "demo"
+      ],
+      "depends_on": [
+        "S1"
+      ],
+      "done_when": "対応する受け入れ条件と回帰テストが通る",
+      "rollback": "実行中の処理を停止し、前の配布版と対応する状態・証拠のバックアップへ戻す"
+    },
+    {
+      "id": "S3",
+      "title": "入力の変化で証拠を失効させる",
+      "requirements": [
+        "R3"
+      ],
+      "checks": [
+        "unit"
+      ],
+      "depends_on": [
+        "S1"
+      ],
+      "done_when": "対応する受け入れ条件と回帰テストが通る",
+      "rollback": "実行中の処理を停止し、前の配布版と対応する状態・証拠のバックアップへ戻す"
+    },
+    {
+      "id": "S4",
+      "title": "チェックを予算内で実行して中断を記録する",
+      "requirements": [
+        "R4"
+      ],
+      "checks": [
+        "unit"
+      ],
+      "depends_on": [
+        "S1"
+      ],
+      "done_when": "対応する受け入れ条件と回帰テストが通る",
+      "rollback": "実行中の処理を停止し、前の配布版と対応する状態・証拠のバックアップへ戻す"
+    },
+    {
+      "id": "S5",
+      "title": "状態と引き渡しの一貫性を確認できる",
+      "requirements": [
+        "R5"
+      ],
+      "checks": [
+        "unit",
+        "demo"
+      ],
+      "depends_on": [
+        "S1"
+      ],
+      "done_when": "対応する受け入れ条件と回帰テストが通る",
+      "rollback": "実行中の処理を停止し、前の配布版と対応する状態・証拠のバックアップへ戻す"
+    }
+  ],
+  "release": {
+    "strategy": "検証したソースをローカル成果物として引き渡す。外部配置は導入先で行う",
+    "rollback": "前の配布版と対応する状態・証拠バックアップへ戻す",
+    "abort_when": [
+      "ゲート未達",
+      "履歴整合性の破損",
+      "実行監督の境界で回帰が発生"
+    ],
+    "observe_checks": [
+      "health"
+    ],
+    "artifacts": [
+      "sdlc/__init__.py",
+      "sdlc/__main__.py",
+      "sdlc/cli.py",
+      "sdlc/engine.py",
+      "sdlc/policy.py",
+      "sdlc/runner.py",
+      "sdlc/schema.py",
+      "sdlc/store.py",
+      "sdlc/workspace.py"
+    ],
+    "irreversible": false,
+    "observation_window_seconds": 60
+  },
+  "budgets": {
+    "max_runs": 30,
+    "max_seconds": 1800,
+    "max_attempts_per_check": 5
+  }
+}

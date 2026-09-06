@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "source_roots": [
+    "sdlc",
+    "tests",
+    "scripts",
+    "examples",
+    "schemas",
+    "docs",
+    "templates",
+    ".github",
+    "README.md",
+    "AGENTS.md",
+    "pyproject.toml",
+    "Makefile",
+    "LICENSE"
+  ],
+  "exclude_dirs": [
+    "__pycache__",
+    ".venv",
+    "node_modules",
+    ".pytest_cache",
+    "build",
+    "dist"
+  ],
+  "evidence_ttl_seconds": 86400,
+  "max_log_bytes": 1048576,
+  "env_allowlist": [
+    "PATH",
+    "LANG",
+    "LC_ALL",
+    "TZ",
+    "SYSTEMROOT",
+    "WINDIR",
+    "PATHEXT",
+    "TMPDIR",
+    "TEMP",
+    "TMP"
+  ],
+  "checks": {
+    "unit": {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-t",
+        ".",
+        "-v"
+      ],
+      "kind": "test",
+      "timeout_seconds": 120,
+      "cwd": ".",
+      "env": {}
+    },
+    "schemas": {
+      "argv": [
+        "python3",
+        "scripts/check_schemas.py"
+      ],
+      "kind": "lint",
+      "timeout_seconds": 30,
+      "cwd": ".",
+      "env": {}
+    },
+    "demo": {
+      "argv": [
+        "python3",
+        "-m",
+        "examples.demo"
+      ],
+      "kind": "test",
+      "timeout_seconds": 60,
+      "cwd": ".",
+      "env": {}
+    },
+    "health": {
+      "argv": [
+        "python3",
+        "-m",
+        "sdlc",
+        "--version"
+      ],
+      "kind": "observe",
+      "timeout_seconds": 10,
+      "cwd": ".",
+      "env": {}
+    }
+  }
+}

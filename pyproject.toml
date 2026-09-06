@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "keel-sdlc"
+version = "0.1.0"
+description = "An evidence-driven SDLC harness for work under uncertainty"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+dependencies = []
+
+[project.scripts]
+keel = "sdlc.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["sdlc*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

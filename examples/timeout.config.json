@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "source_roots": [
+    "app.py",
+    "test_app.py"
+  ],
+  "exclude_dirs": [
+    "__pycache__",
+    ".venv",
+    "node_modules",
+    ".pytest_cache",
+    "build",
+    "dist"
+  ],
+  "evidence_ttl_seconds": 86400,
+  "max_log_bytes": 1048576,
+  "env_allowlist": [
+    "PATH",
+    "LANG",
+    "LC_ALL",
+    "TZ",
+    "SYSTEMROOT",
+    "WINDIR",
+    "PATHEXT",
+    "TMPDIR",
+    "TEMP",
+    "TMP"
+  ],
+  "checks": {
+    "unit": {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "test_app",
+        "-v"
+      ],
+      "kind": "test",
+      "timeout_seconds": 10,
+      "cwd": ".",
+      "env": {}
+    },
+    "health": {
+      "argv": [
+        "python3",
+        "-c",
+        "import runpy; f=runpy.run_path('.sdlc/deployed/app.py')['normalize_timeout']; assert f(None)==30; assert f('2.5')==2.5; print('local deployed artifact responds correctly')"
+      ],
+      "kind": "observe",
+      "timeout_seconds": 10,
+      "cwd": ".",
+      "env": {}
+    }
+  }
+}

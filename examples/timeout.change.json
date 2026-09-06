@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "id": "timeout",
+  "intent": "Clarify and implement a safe timeout contract",
+  "owner": "demo-product-owner (simulated)",
+  "risk": "medium",
+  "scope": {
+    "include": [
+      "Normalize one timeout value"
+    ],
+    "exclude": [
+      "Networking",
+      "Retries",
+      "Production deployment"
+    ],
+    "constraints": [
+      "No external dependencies"
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "statement": "Omitted timeout defaults to 30 seconds",
+      "acceptance": [
+        "None returns 30.0"
+      ],
+      "checks": [
+        "unit"
+      ],
+      "priority": "must"
+    },
+    {
+      "id": "R2",
+      "statement": "Explicit timeout is a positive finite number",
+      "acceptance": [
+        "2.5 and '2.5' return 2.5",
+        "Zero, negatives, NaN, infinity and booleans raise ValueError"
+      ],
+      "checks": [
+        "unit"
+      ],
+      "priority": "must"
+    }
+  ],
+  "uncertainties": [
+    {
+      "id": "U1",
+      "question": "Does zero disable the timeout?",
+      "kind": "requirement",
+      "impact": 3,
+      "confidence": "unknown",
+      "reversibility": "easy",
+      "blocks": "build",
+      "requirements": [
+        "R2"
+      ],
+      "probe": "Obtain the owner's explicit zero-value semantics",
+      "check": "",
+      "fallback": "Keep the old interface until semantics are agreed",
+      "effort_minutes": 5,
+      "owner": "demo-product-owner (simulated)"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "question": "Implicit timeout disabling?",
+      "choice": "Reject zero",
+      "alternatives": [
+        "Zero disables timeout",
+        "A separate disable flag"
+      ],
+      "rationale": "An accidental zero must not create an unbounded wait",
+      "reversibility": "easy",
+      "rollback": "Restore the preceding module",
+      "uncertainties": [
+        "U1"
+      ]
+    }
+  ],
+  "slices": [
+    {
+      "id": "S1",
+      "title": "Default and validate the timeout",
+      "requirements": [
+        "R1",
+        "R2"
+      ],
+      "checks": [
+        "unit"
+      ],
+      "depends_on": [],
+      "done_when": "All declared timeout cases pass",
+      "rollback": "Restore the previous app.py from the local backup"
+    }
+  ],
+  "release": {
+    "strategy": "Copy the verified module to an isolated local deployment directory",
+    "rollback": "Restore .sdlc/deployed/previous.py",
+    "abort_when": [
+      "Health check fails"
+    ],
+    "observe_checks": [
+      "health"
+    ],
+    "artifacts": [
+      "app.py"
+    ],
+    "irreversible": false,
+    "observation_window_seconds": 1
+  },
+  "budgets": {
+    "max_runs": 30,
+    "max_seconds": 1800,
+    "max_attempts_per_check": 5
+  }
+}
